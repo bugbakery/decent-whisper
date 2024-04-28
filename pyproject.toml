@@ -1,0 +1,25 @@
+[project]
+name = "decent-whisper"
+version = "0.1.0"
+description = "use the fastest whisper implementation on every hardware"
+authors = [{ name = "Jaro Habiger", email = "jarohabiger@googlemail.com" }]
+dependencies = ["faster-whisper>=1.0.1", "torch>=2.3.0"]
+requires-python = ">= 3.10"
+readme = "README.md"
+license = { text = "AGPL-3.0" }
+
+[project.optional-dependencies]
+macOS = ["lightning-whisper-mlx>=0.0.10", "mlx>=0.12.0"]
+cuda = [
+    "insanely-fast-whisper>=0.0.8",
+    "flash-attn>=2.5.8",
+    "transformers>=4.39.3",
+]
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[tool.pdm]
+distribution = true
