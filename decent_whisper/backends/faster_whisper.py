@@ -1,17 +1,16 @@
 from typing import Iterable, List, Optional, Tuple
-from decent_whisper import TranscriptionInfo, Word, TranscriptionInfo, settings
+from decent_whisper import Word, TranscriptionInfo
 
 
 def transcribe(
     audio: List[float], model_name: str, lang_code: Optional[str] = "en"
 ) -> Tuple[Iterable[List[Word]], TranscriptionInfo]:
-    import faster_whisper
     import faster_whisper.transcribe
     from faster_whisper import WhisperModel
 
     model = WhisperModel(
         model_size_or_path=model_name,
-        download_root=str(settings.model_dir.absolute()),
+        # download_root=str(settings.model_dir.absolute()),
     )
 
     def map_iter(

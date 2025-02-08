@@ -24,7 +24,7 @@ setup(
     version="0.0.1",
     install_requires=[
         # faster whisper:
-        "pywhispercpp~=1.3.0",
+        "faster-whisper~=1.1.1",
         # cuda:
         *cuda_deps,
         # mlx:
