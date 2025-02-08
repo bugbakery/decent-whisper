@@ -3,7 +3,7 @@
 
 import sys
 import warnings
-from typing import List, Optional, Tuple, Union
+from typing import Callable, List, Optional, Tuple, Union
 
 import mlx.core as mx
 import numpy as np
@@ -21,7 +21,7 @@ from mlx_whisper.audio import (
 from mlx_whisper.decoding import DecodingOptions, DecodingResult
 from mlx_whisper.timing import add_word_timestamps
 from mlx_whisper.tokenizer import LANGUAGES, get_tokenizer
-from mlx_whisper.transcribe import ModelHolder
+from mlx_whisper.transcribe import ModelHolder, _get_end
 
 def transcribe(
     audio: Union[str, np.ndarray, mx.array],
@@ -39,6 +39,9 @@ def transcribe(
     append_punctuations: str = "\"'.。,，!！?？:：”)]}、",
     clip_timestamps: Union[str, List[float]] = "0",
     hallucination_silence_threshold: Optional[float] = None,
+    on_new_segment: Optional[Callable[[dict], None]] = None,
+    on_language_detected: Optional[Callable[[str], None]] = None,
+    silent: bool = False,
     **decode_options,
 ):
     """
@@ -136,6 +139,10 @@ def transcribe(
             mel_segment = pad_or_trim(mel, N_FRAMES, axis=-2).astype(dtype)
             _, probs = model.detect_language(mel_segment)
             decode_options["language"] = max(probs, key=probs.get)
+
+            if on_language_detected:
+                on_language_detected(decode_options["language"])
+
             if verbose is not None:
                 print(
                     f"Detected language: {LANGUAGES[decode_options['language']].title()}"
@@ -241,7 +248,7 @@ def transcribe(
 
     # show the progress bar when verbose is False (if True, transcribed text will be printed)
     with tqdm.tqdm(
-        total=content_frames, unit="frames", disable=verbose is not False
+        total=content_frames, unit="frames", disable=silent or verbose is not False
     ) as pbar:
         last_speech_timestamp = 0.0
         for seek_clip_start, seek_clip_end in seek_clips:
@@ -483,6 +490,10 @@ def transcribe(
                         )
                     ]
                 )
+                if on_new_segment:
+                    for segment in current_segments:
+                        on_new_segment(segment)
+
                 all_tokens.extend(
                     [
                         token
