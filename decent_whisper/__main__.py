@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('audio_file')
 parser.add_argument('--model', help='which model to use', choices=['tiny', 'base', 'small', 'medium', 'large'], default='large', required=False)
-parser.add_argument('--lang', help='language code', default='auto', required=False)
+parser.add_argument('--lang', help='language code', default=None, required=False)
 
 args = parser.parse_args()
 
