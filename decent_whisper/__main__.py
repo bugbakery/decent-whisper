@@ -25,6 +25,6 @@ end = time()
 duration = end - start
 print(f"-> transcribed in {duration}s")
 
-from .backends.mlx_whisper.audio import load_audio, SAMPLE_RATE
+from mlx_whisper.audio import load_audio, SAMPLE_RATE
 audio_duration = len(load_audio(args.audio_file)) / SAMPLE_RATE
 print(f"-> realtime factor of {audio_duration / duration}")

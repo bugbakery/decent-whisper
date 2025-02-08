@@ -4,7 +4,7 @@ from os import environ
 
 mlx_deps = []
 if "macOS" in platform() and "arm64" in platform():
-    mlx_deps += ["mlx-whisper~=0.4.1", "mlx>=0.12.0"]
+    mlx_deps += ["mlx-whisper==0.4.1", "mlx>=0.12.0"]
 
 cuda_deps = []
 try:

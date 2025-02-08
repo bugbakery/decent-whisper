@@ -19,7 +19,7 @@ class Settings(NamedTuple):
 
 settings = Settings
 
-def get_backend() -> str:
+def get_backend():
     from .backends import insanely_fast_whisper, mlx_whisper, faster_whisper
 
     if insanely_fast_whisper.should_use():
