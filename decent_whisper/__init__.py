@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Iterable, List, NamedTuple, Tuple
 
@@ -20,6 +21,7 @@ class TranscriptionInfo(NamedTuple):
 
 class Settings:
     models_dir: Path = Path(".models")
+    cpu_threads: int = os.cpu_count() or 4
 
 
 settings = Settings
