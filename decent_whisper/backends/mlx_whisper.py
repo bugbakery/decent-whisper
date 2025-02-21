@@ -21,7 +21,7 @@ def should_use():
 
 
 def transcribe(
-    audio: NDArray[np.float64] | str, model_info: ModelInfo, language: Optional[str] = None
+    audio: NDArray[np.float64] | str, model: ModelInfo, language: Optional[str] = None
 ) -> Tuple[Iterable[List[Word]], TranscriptionInfo]:
     queue = SimpleQueue()
     error_event = threading.Event()
@@ -38,7 +38,7 @@ def transcribe(
         try:
             transcribe_mlx(
                 audio,
-                path_or_hf_repo=str(path_for_model(model_info)),
+                path_or_hf_repo=str(path_for_model(model)),
                 language=language,
                 word_timestamps=True,
                 on_new_segment=on_new_segment,
