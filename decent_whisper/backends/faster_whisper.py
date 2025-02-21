@@ -3,7 +3,7 @@ from typing import Iterable, List, Optional, Tuple
 import numpy as np
 from numpy.typing import NDArray
 
-from decent_whisper import Word, TranscriptionInfo
+from decent_whisper import settings, Word, TranscriptionInfo
 from decent_whisper.model import ALL_LANGUAGES, TURBO_LANGUAGES, ModelInfo, path_for_model
 
 
@@ -19,6 +19,7 @@ def transcribe(
 
     whisper_model = WhisperModel(
         model_size_or_path=str(path_for_model(model)),
+        cpu_threads=settings.cpu_threads,
     )
 
     def map_iter(
