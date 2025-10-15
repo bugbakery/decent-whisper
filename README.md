@@ -10,7 +10,7 @@ use the fastest whisper implementation on every hardware
 
 Currently, this package can dispatch to (in order of preference):
 
-1. [insanely-fast-whisper](https://github.com/Vaibhavs10/insanely-fast-whisper)
+1. [transformers whisper with flash attn](https://huggingface.co/docs/transformers/model_doc/whisper)
    (On NVIDIA systems)
 2. [mlx-whisper](https://github.com/ml-explore/mlx-examples/tree/main/whisper)
    (On Apple Silicon)

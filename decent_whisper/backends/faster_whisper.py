@@ -8,7 +8,11 @@ from decent_whisper.model import ALL_LANGUAGES, TURBO_LANGUAGES, ModelInfo, path
 
 
 def name():
-    return "faster_whisper"
+    return "faster"
+
+
+def is_available():
+    return True
 
 
 def transcribe(

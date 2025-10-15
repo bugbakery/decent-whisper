@@ -12,7 +12,7 @@ try:
     import torch
 
     if torch.cuda.is_available():
-        cuda_deps += ["insanely-fast-whisper~=0.0.15", "transformers~=4.39.3"]
+        cuda_deps += ["transformers~=4.39.3"]
         if "CUDA_HOME" in environ:
             cuda_deps += ["flash-attn~=2.5.8"]
 except ImportError:

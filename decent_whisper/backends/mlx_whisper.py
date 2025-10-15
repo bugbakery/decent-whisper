@@ -13,10 +13,10 @@ from .mlx_whisper_transcribe import transcribe as transcribe_mlx
 
 
 def name():
-    return "mlx_whisper"
+    return "mlx"
 
 
-def should_use():
+def is_available():
     return importlib.util.find_spec("mlx") is not None
 
 
