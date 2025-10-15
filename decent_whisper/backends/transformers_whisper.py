@@ -1,9 +1,18 @@
+from os import path
 from pathlib import Path
 from typing import Iterable, List, Optional, Tuple
 
 from numpy.typing import NDArray
 import numpy as np
+from regex.regex import Regex
 from transformers.generation.streamers import BaseStreamer
+from transformers.integrations.flex_attention import Offset
+from transformers.models.auto import AutoModel
+from transformers.models.whisper.feature_extraction_whisper import (
+    WhisperFeatureExtractor,
+)
+from transformers.models.whisper.modeling_whisper import WhisperPreTrainedModel
+from transformers.models.whisper.tokenization_whisper import WhisperTokenizer
 
 from .. import TranscriptionInfo, Word
 from ..model import ALL_LANGUAGES, TURBO_LANGUAGES, ModelInfo, path_for_model
@@ -53,25 +62,69 @@ def transcribe(
         `{"sampling_rate": int, "raw": np.ndarray, "partial" bool}` With optionally a `"stride" (int, int)` key if
         `stride_length_s` is defined.
     """
-    def chunk_audio(audio: NDArray[np.float64], chunk_length_s: float, stride_s: float):
-        chunk_size = int(chunk_length_s * 16000)
-        stride = int(stride_s * 16000)
-        i = 0
-        while True:
-            regular_start = i * chunk_size
-            start = max(0, regular_start - stride)
-            end = min(len(audio), start + chunk_size)
 
-            stride_start =
-            stride_end =
+    # whisper_model = WhisperPreTrainedModel.from_pretrained(path_for_model(model))
+    # tokenizer = WhisperTokenizer.from_pretrained(path_for_model(model))
+    # feature_extractor = WhisperFeatureExtractor.from_pretrained(path_for_model(model))
+
+    pipe = pipeline(
+        "automatic-speech-recognition",
+        # model=whisper_model,
+        model="openai/whisper-small",
+        # tokenizer=tokenizer,
+        # feature_extractor=feature_extractor,
+        return_timestamps="word",
+        device=0,
+    )
+
+    sampling_rate = 16000
+
+    def chunk_audio(audio: NDArray[np.float64], chunk_length_s: float, stride_s: float):
+        chunk_size = int(chunk_length_s * sampling_rate)
+        stride = int(stride_s * sampling_rate)
+
+        if stride * 2 >= chunk_size:
+            raise ValueError(
+                f"Stride needs to be strictly smaller than chunk_size: ({stride} * 2) vs {chunk_size}"
+            )
+
+        offset = 0
+
+        while True:
+            end = min(len(audio), offset + chunk_size)
+            stride_left = min(offset, stride)
+            stride_right = min(end - offset, stride)
+
+            # if (offset + stride_left + stride_right) > len(audio):
+            #     break
+
+            print(
+                {
+                    "sampling_rate": sampling_rate,
+                    "partial": False,
+                    "start": offset,
+                    "end": end,
+                    "stride": (
+                        stride_left,
+                        stride_right,
+                    ),
+                    "len": len(audio[offset:end]),
+                }
+            )
 
             yield {
-                "sampling_rate": 16000,
-                "raw": audio[i:i+chunk_size],
+                "sampling_rate": sampling_rate,
+                "raw": audio[offset:end],
                 "partial": False,
-                "stride": (None, None)
+                "stride": (stride_left, stride_right),
             }
-            chunks.append(audio[i:i+chunk_size])
+
+            offset += chunk_size - stride_right - stride_left
+
+    chunks = chunk_audio(audio, chunk_length_s=5, stride_s=1)
+
+    for item in pipe(chunks):
+        print(item)
 
     return outputs, TranscriptionInfo(language=None)
 

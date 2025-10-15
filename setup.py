@@ -23,7 +23,7 @@ setup(
     name="decent_whisper",
     version="0.0.1",
     install_requires=[
-        "huggingface-hub~=0.28.1",
+        "huggingface-hub~=0.34.1",
         "tqdm~=4.0",
         # faster whisper:
         "faster-whisper~=1.1.1",
