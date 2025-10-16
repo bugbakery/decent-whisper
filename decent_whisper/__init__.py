@@ -26,17 +26,27 @@ class Settings:
 
 settings = Settings
 
+def available_backends():
+    from .backends import mlx_whisper, faster_whisper
 
-def get_backend():
-    from .backends import insanely_fast_whisper, mlx_whisper, faster_whisper
+    # these are ranked best-to-worst
+    backends = [
+        mlx_whisper,
+        faster_whisper
+    ]
 
-    # if insanely_fast_whisper.should_use():
-    #     return insanely_fast_whisper
-    if mlx_whisper.should_use():
-        return mlx_whisper
+    return [backend for backend in backends if backend.is_available()]
+
+def get_backend(name=None):
+    backends = available_backends()
+
+    if name:
+        if name not in backends:
+            raise ValueError(f"Backend {name} is not available")
+        else:
+            return next(backend for backend in backends if backend.name() == name)
     else:
-        return faster_whisper
-
+        return backends[0]
 
 def transcribe(
     audio: NDArray[np.float64] | str, *, model: ModelInfo, language: str | None = None
