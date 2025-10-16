@@ -5,7 +5,19 @@ from typing import Iterable, List, NamedTuple, Tuple
 import numpy as np
 from numpy.typing import NDArray
 
-from decent_whisper.model import ModelInfo, is_model_downloaded
+from . import model
+from .model import ModelInfo, is_model_downloaded
+
+__all__ = [
+    "model",
+    "Word",
+    "TranscriptionInfo",
+    "available_backends",
+    "get_backend",
+    "transcribe",
+    "available_models",
+    "downloaded_models"
+]
 
 
 class Word(NamedTuple):
@@ -59,7 +71,7 @@ def transcribe(
     return backend.transcribe(audio, model, language)
 
 
-def available_models():
+def available_models() -> List[ModelInfo]:
     return get_backend().available_models()
 
 
