@@ -1,10 +1,7 @@
 # decent-whisper
 
-use the fastest whisper implementation on some hardware
-
-```diff
-- this package is highly work-in-progress and not ready for usage yet
-```
+use the fastest whisper implementation on some hardware.
+Used by [transcribee](https://github.com/bugbakery/transcribee).
 
 ## backends
 
