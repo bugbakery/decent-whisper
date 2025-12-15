@@ -9,7 +9,6 @@ from threading import Thread
 
 from decent_whisper import Word, TranscriptionInfo
 from decent_whisper.model import ALL_LANGUAGES, TURBO_LANGUAGES, ModelInfo, path_for_model
-from .mlx_whisper_transcribe import transcribe as transcribe_mlx
 
 
 def name():
@@ -26,6 +25,9 @@ def transcribe(
     queue = SimpleQueue()
     error_event = threading.Event()
     exception = None
+
+    from .mlx_whisper_transcribe import transcribe as transcribe_mlx
+
 
     def work():
         def on_new_segment(segment: dict):
