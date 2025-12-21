@@ -16,7 +16,7 @@ __all__ = [
     "get_backend",
     "transcribe",
     "available_models",
-    "downloaded_models"
+    "downloaded_models",
 ]
 
 
@@ -38,27 +38,30 @@ class Settings:
 
 settings = Settings
 
-def available_backends():
-    from .backends import mlx_whisper, faster_whisper
 
-    # these are ranked best-to-worst
-    backends = [
-        mlx_whisper,
-        faster_whisper
-    ]
+def available_backends():
+    from .backends import faster_whisper, mlx_whisper
+
+    # these are ranked fastest-to-slowest
+    backends = [mlx_whisper, faster_whisper]
 
     return [backend for backend in backends if backend.is_available()]
+
 
 def get_backend(name=None):
     backends = available_backends()
 
     if name:
-        if name not in backends:
+        backend = next(
+            (backend for backend in backends if backend.name() == name), None
+        )
+        if not backend:
             raise ValueError(f"Backend {name} is not available")
         else:
-            return next(backend for backend in backends if backend.name() == name)
+            return backend
     else:
         return backends[0]
+
 
 def transcribe(
     audio: NDArray[np.float64] | str, *, model: ModelInfo, language: str | None = None
