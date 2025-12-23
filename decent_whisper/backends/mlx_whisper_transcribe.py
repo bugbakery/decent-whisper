@@ -8,7 +8,6 @@ from typing import Callable, List, Optional, Tuple, Union
 import mlx.core as mx
 import numpy as np
 import tqdm
-
 from mlx_whisper.audio import (
     FRAMES_PER_SECOND,
     HOP_LENGTH,
@@ -18,10 +17,13 @@ from mlx_whisper.audio import (
     log_mel_spectrogram,
     pad_or_trim,
 )
-from mlx_whisper.decoding import DecodingOptions, DecodingResult
 from mlx_whisper.timing import add_word_timestamps
 from mlx_whisper.tokenizer import LANGUAGES, get_tokenizer
 from mlx_whisper.transcribe import ModelHolder, _get_end
+from requests.models import DecodeError
+
+from .mlx_whisper_decoding import DecodingOptions, DecodingResult, decode
+
 
 def transcribe(
     audio: Union[str, np.ndarray, mx.array],
@@ -191,8 +193,8 @@ def transcribe(
                 # disable best_of when t == 0
                 kwargs.pop("best_of", None)
 
-            options = DecodingOptions(**kwargs, temperature=t)
-            decode_result = model.decode(segment, options)
+            options = DecodingOptions(**kwargs, beam_size=5, patience=1, temperature=t)
+            decode_result = decode(model, segment, options)
 
             needs_fallback = False
             if (

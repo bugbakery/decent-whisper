@@ -1,14 +1,21 @@
 import importlib.util
-from queue import SimpleQueue
 import threading
+from queue import SimpleQueue
+from threading import Thread
 from time import sleep
 from typing import Iterable, List, Optional, Tuple
-import numpy as np
-from numpy.typing import NDArray
-from threading import Thread
 
-from decent_whisper import Word, TranscriptionInfo
-from decent_whisper.model import ALL_LANGUAGES, TURBO_LANGUAGES, ModelInfo, path_for_model
+import numpy as np
+from faster_whisper.audio import decode_audio
+from numpy.typing import NDArray
+
+from decent_whisper import TranscriptionInfo, Word, vad
+from decent_whisper.model import (
+    ALL_LANGUAGES,
+    TURBO_LANGUAGES,
+    ModelInfo,
+    path_for_model,
+)
 
 
 def name():
@@ -26,8 +33,12 @@ def transcribe(
     error_event = threading.Event()
     exception = None
 
-    from .mlx_whisper_transcribe import transcribe as transcribe_mlx
+    if not isinstance(audio, np.ndarray):
+        audio = decode_audio(audio, sampling_rate=16000)
 
+    audio, speech_timestamps_map = vad.apply_vad_to_audio(audio)
+
+    from .mlx_whisper_transcribe import transcribe as transcribe_mlx
 
     def work():
         def on_new_segment(segment: dict):
@@ -71,7 +82,7 @@ def transcribe(
                     start=word["start"],
                     end=word["end"],
                     probability=word["probability"],
-                    word=word["word"]
+                    word=word["word"],
                 )
                 for word in segment["words"]
             ]
