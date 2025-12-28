@@ -33,7 +33,7 @@ class TranscriptionInfo(NamedTuple):
 
 class Settings:
     models_dir: Path = Path(".models")
-    cpu_threads: int = os.cpu_count() or 4
+    cpu_threads: int = int(os.environ.get("OMP_NUM_THREADS", str(os.cpu_count() or 4)))
 
 
 settings = Settings
